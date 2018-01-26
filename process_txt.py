@@ -18,7 +18,6 @@ def collect_urls(fname25, fname, prefix):
     return [prefix + postfix for postfix in postfixes]
 
 
-
 if __name__ == '__main__':
     r = collect_urls('myrawdata25.txt', 'myrawdata.txt', 'https://www.instagram.com')
     print(r[-1])
