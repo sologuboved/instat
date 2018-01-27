@@ -52,5 +52,5 @@ class Collection(object):
 
 if __name__ == '__main__':
     c = Collection(MYDATA_JSON)
-    c.sort_by_likes()
+    c.find_tag_freqs()
 

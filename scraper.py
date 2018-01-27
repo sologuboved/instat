@@ -76,16 +76,6 @@ def print_glitch(text, page_url):
     print()
 
 
-# def convert(json_fname):
-#     collection = load_json(json_fname)
-#     for url in collection:
-#         item = collection[url]
-#         item[LIKES] = int(item[LIKES])
-#         item[DATE] = item[DATE][0] + ' ' + item[DATE][1]
-#         print(item[DATE])
-#     # dump_json(collection, json_fname)
-
-
 if __name__ == '__main__':
     pass
     # scrape_page('https://www.instagram.com/p/BdpQMUFBf3b/?taken-by=thalassografia')

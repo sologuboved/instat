@@ -32,4 +32,4 @@ if __name__ == '__main__':
     pass
     # r = collect_urls(MYDATA25, MYDATA, INSTAGRAM)
     # print(r[-1])
-    dump_urls(INSTAURLS, MYDATA25, MYDATA, INSTAGRAM)
+    # dump_urls(INSTAURLS, MYDATA25, MYDATA, INSTAGRAM)
