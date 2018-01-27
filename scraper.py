@@ -10,6 +10,10 @@ MYDATA25 = 'myrawdata25.txt'
 MYDATA_JSON = 'mydata.json'
 INSTAGRAM = 'https://www.instagram.com'
 
+LIKES = 'likes'
+TAGS = 'tags'
+DATE = 'date'
+
 
 def dump_collection(json_fname, fname25, fname, prefix):
     print("Dumping json...")
@@ -52,7 +56,16 @@ def scrape_page(page_url):
         print()
     tags = re.findall('<meta content="(.*?)" property="instapp:hashtags"/>', str_soup)
     date = re.findall('<meta content="Instagram post by Буратино • (.*?) at', str_soup)
-    return {'likes': likes, 'tags': tags, 'date': date}
+    return {LIKES: likes, TAGS: tags, DATE: date}
+
+
+def convert(json_fname):
+    collection = load_json(json_fname)
+    for url in collection:
+        item = collection[url]
+        item[LIKES] = int(item[LIKES])
+        item[DATE] = item[DATE][0]
+    dump_json(collection, json_fname)
 
 
 if __name__ == '__main__':
@@ -62,4 +75,5 @@ if __name__ == '__main__':
     # coll = load_json(MYDATA_JSON)
     # print(coll['https://www.instagram.com/p/7TNru4AwSX/?taken-by=thalassografia'])
     # print(len(coll))
+    # convert(MYDATA_JSON)
 
