@@ -24,9 +24,11 @@ class Collection(object):
             date = datetime.strptime(item[DATE], "%b %d, %Y %I:%M%p %Z")
             self.collection.append({URL: url, LIKES: item[LIKES], TAGS: tags, DATE: date})
 
-    def prettyprint(self):
+    def prettyprint(self, allotment=None):
         ind = 1
-        for item in self.collection:
+        if not allotment:
+            allotment = self.collection
+        for item in allotment:
             print('<%d>' % ind)
             print('url:', item[URL])
             print('date:', item[DATE].strftime("%d %B %Y, %A %I:%M%p"))
@@ -82,8 +84,24 @@ class Collection(object):
     def find_total_likes(self):
         print(sum(item[LIKES] for item in self.collection))
 
+    def analyze_tags(self):
+        all_tags = dict()
+        for item in self.collection:
+            tags = item[TAGS]
+            for tag in tags:
+                times_likes = all_tags.get(tag, [0, 0])
+                times_likes[0] += 1
+                times_likes[1] += item[LIKES]
+                all_tags[tag] = times_likes
+        for tag in all_tags:
+            times, likes = all_tags[tag]
+            print("%s: μ = %d, posted %d times, received %d likes" % (tag, float(likes) / times, times, likes))
+
+    def find_by_tag(self, tag):
+        self.prettyprint([item for item in self.collection if tag in item[TAGS]])
+
 
 if __name__ == '__main__':
     c = Collection(MYDATA_JSON)
-    c.find_total_likes()
+    c.find_by_tag('zoo')
 
