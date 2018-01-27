@@ -49,8 +49,21 @@ class Collection(object):
         self.collection.sort(key=lambda i: i[LIKES], reverse=True)
         self.prettyprint()
 
+    def find_dayofweek_stat(self):
+        dow = {'Mon': [0, 0], 'Tue': [0, 0], 'Wed': [0, 0], 'Thu': [0, 0], 'Fri': [0, 0], 'Sat': [0, 0], 'Sun': [0, 0]}
+        for item in self.collection:
+            times_likes = dow[item[DATE].strftime('%a')]
+            times_likes[0] += 1
+            times_likes[1] += item[LIKES]
+        for day in dow:
+            times, likes = dow[day]
+            try:
+                print("%s: μ = %d, posted %d times, received %d likes" % (day, float(likes) / times, times, likes))
+            except ZeroDivisionError:
+                print("%s: μ = n/a, posted %d times, received %d likes" % (day, times, likes))
+
 
 if __name__ == '__main__':
     c = Collection(MYDATA_JSON)
-    c.find_tag_freqs()
+    c.find_dayofweek_stat()
 
