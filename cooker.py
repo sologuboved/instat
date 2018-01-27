@@ -21,7 +21,7 @@ class Collection(object):
             tags = item[TAGS]
             for tag in tags:
                 self.tags.add(tag)
-            date = datetime.strptime(item[DATE], "%b %d, %Y")
+            date = datetime.strptime(item[DATE], "%b %d, %Y %I:%M%p %Z")
             self.collection.append({URL: url, LIKES: item[LIKES], TAGS: tags, DATE: date})
 
     def prettyprint(self):
@@ -29,7 +29,7 @@ class Collection(object):
         for item in self.collection:
             print('<%d>' % ind)
             print('url:', item[URL])
-            print('date:', item[DATE].strftime("%d %B %Y, %A"))
+            print('date:', item[DATE].strftime("%d %B %Y, %A %I:%M%p"))
             print('likes:', item[LIKES])
             print('tags:')
             for tag in item[TAGS]:
@@ -48,7 +48,6 @@ class Collection(object):
     def sort_by_likes(self):
         self.collection.sort(key=lambda i: i[LIKES], reverse=True)
         self.prettyprint()
-
 
 
 if __name__ == '__main__':
