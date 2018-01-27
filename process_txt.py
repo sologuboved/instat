@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import re
+from json_operations import dump_json
+
+
+MYDATA = 'myrawdata.txt'
+MYDATA25 = 'myrawdata25.txt'
+INSTAURLS = 'instaurls.json'
+INSTAGRAM = 'https://www.instagram.com'
 
 
 def process(fname, border=None):
@@ -17,6 +24,12 @@ def collect_urls(fname25, fname, prefix):
     return [prefix + postfix for postfix in postfixes]
 
 
+def dump_urls(fname_urls, fname25, fname, prefix):
+    dump_json(collect_urls(fname25, fname, prefix), fname_urls)
+
+
 if __name__ == '__main__':
-    r = collect_urls('myrawdata25.txt', 'myrawdata.txt', 'https://www.instagram.com')
-    print(r[-1])
+    pass
+    # r = collect_urls(MYDATA25, MYDATA, INSTAGRAM)
+    # print(r[-1])
+    dump_urls(INSTAURLS, MYDATA25, MYDATA, INSTAGRAM)
