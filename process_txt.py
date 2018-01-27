@@ -14,7 +14,6 @@ def process(fname, border=None):
 
 def collect_urls(fname25, fname, prefix):
     postfixes = process(fname25, 25) + process(fname)
-    print(postfixes[0])
     return [prefix + postfix for postfix in postfixes]
 
 
