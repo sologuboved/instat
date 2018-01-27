@@ -5,6 +5,12 @@ from json_operations import *
 from process_txt import collect_urls
 
 
+MYDATA = 'myrawdata.txt'
+MYDATA25 = 'myrawdata25.txt'
+MYDATA_JSON = 'mydata.json'
+INSTAGRAM = 'https://www.instagram.com'
+
+
 def dump_collection(json_fname, fname25, fname, prefix):
     print("Dumping json...")
     dump_json(build_collection(fname25, fname, prefix), json_fname)
@@ -52,7 +58,8 @@ def scrape_page(page_url):
 if __name__ == '__main__':
     pass
     # scrape_page('https://www.instagram.com/p/BdpQMUFBf3b/?taken-by=thalassografia')
-    # dump_collection('mydata.json', 'myrawdata25.txt', 'myrawdata.txt', 'https://www.instagram.com')
-    coll = load_json('mydata.json')
-    print(coll['https://www.instagram.com/p/7TNru4AwSX/?taken-by=thalassografia'])
+    # dump_collection(MYDATA_JSON, MYDATA25, MYDATA, INSTAGRAM)
+    # coll = load_json(MYDATA_JSON)
+    # print(coll['https://www.instagram.com/p/7TNru4AwSX/?taken-by=thalassografia'])
     # print(len(coll))
+
