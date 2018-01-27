@@ -45,25 +45,45 @@ class Collection(object):
         for freq in sorted(tag_freqs.items(), key=lambda i: i[1], reverse=True):
             print(freq[0] + ':', freq[1])
 
-    def sort_by_likes(self):
-        self.collection.sort(key=lambda i: i[LIKES], reverse=True)
+    def sort_by(self, field):
+        self.collection.sort(key=lambda i: i[field], reverse=True)
         self.prettyprint()
 
     def find_dayofweek_stat(self):
-        dow = {'Mon': [0, 0], 'Tue': [0, 0], 'Wed': [0, 0], 'Thu': [0, 0], 'Fri': [0, 0], 'Sat': [0, 0], 'Sun': [0, 0]}
+        dow = dict()
         for item in self.collection:
-            times_likes = dow[item[DATE].strftime('%a')]
+            day = item[DATE].strftime('%a')
+            times_likes = dow.get(day, [0, 0])
             times_likes[0] += 1
             times_likes[1] += item[LIKES]
+            dow[day] = times_likes
         for day in dow:
             times, likes = dow[day]
-            try:
-                print("%s: μ = %d, posted %d times, received %d likes" % (day, float(likes) / times, times, likes))
-            except ZeroDivisionError:
-                print("%s: μ = n/a, posted %d times, received %d likes" % (day, times, likes))
+            print("%s: μ = %d, posted %d times, received %d likes" % (day, float(likes) / times, times, likes))
+
+    def find_timeofday_stat(self):
+        utc_tod = dict()
+        for item in self.collection:
+            hour = item[DATE].strftime('%I') + item[DATE].strftime('%p')
+            times_likes = utc_tod.get(hour, [0, 0])
+            times_likes[0] += 1
+            times_likes[1] += item[LIKES]
+            utc_tod[hour] = times_likes
+        tod = dict()
+        for utc_hour in utc_tod:
+            times, likes = utc_tod[utc_hour]
+            hour = str(int(utc_hour[:2]) + 3) + utc_hour[2:]
+            tod[hour] = (times, likes, float(likes) / times)
+        for item in sorted(tod.items(), key=lambda i: i[1][2]):
+            hour = item[0]
+            w_s = ' ' * (5 - len(hour))
+            print("%s:%s μ = %d, posted %d times, received %d likes" % (hour, w_s, item[1][2], item[1][0], item[1][1]))
+
+    def find_total_likes(self):
+        print(sum(item[LIKES] for item in self.collection))
 
 
 if __name__ == '__main__':
     c = Collection(MYDATA_JSON)
-    c.find_dayofweek_stat()
+    c.find_total_likes()
 
