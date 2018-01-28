@@ -8,7 +8,7 @@ TAGS = 'tags'
 DATE = 'date'
 
 
-class Collection(object):
+class Instat(object):
     def __init__(self, json_fname):
         self.collection = list()
         self.tags = set()
@@ -23,6 +23,9 @@ class Collection(object):
                 self.tags.add(tag)
             date = datetime.strptime(item[DATE], "%b %d, %Y %I:%M%p %Z")
             self.collection.append({URL: url, LIKES: item[LIKES], TAGS: tags, DATE: date})
+
+    def filter_by_date(self, start, end):
+        pass
 
     def prettyprint(self, allotment=None):
         ind = 1
@@ -57,24 +60,36 @@ class Collection(object):
         for freq in sorted(tag_freqs.items(), key=lambda i: i[1], reverse=True):
             print(freq[0] + ':', freq[1])
 
-    def analyze_tags(self):
+    def analyse_tags(self, larger_than=0, smaller_than=float('inf')):
         all_tags = dict()
         for item in self.collection:
             tags = item[TAGS]
             for tag in tags:
-                times_likes = all_tags.get(tag, [0, 0])
-                times_likes[0] += 1
-                times_likes[1] += item[LIKES]
-                all_tags[tag] = times_likes
+                new_likes = all_tags.get(tag, list())
+                new_likes.append(item[LIKES])
+                all_tags[tag] = new_likes
         filtered_tags = list()
         for tag in all_tags:
-            times, likes = all_tags[tag]
-            if 10 <= times <= 100:
-                filtered_tags.append((tag, times, likes, float(likes) / times))
-        for item in sorted(filtered_tags, key=lambda i: i[3], reverse=True):
+            likes = all_tags[tag]
+            times = len(likes)
+            if larger_than < times < smaller_than:
+                num_likes = sum(likes)
+                mean = num_likes / float(times)
+                s_d = find_sd(likes, mean)
+                try:
+                    quotient = mean / s_d
+                    filtered_tags.append((tag, times, num_likes, mean, s_d, quotient))
+                except ZeroDivisionError:
+                    pass
+        for item in sorted(filtered_tags, key=lambda i: i[5], reverse=True):
             tag = item[0]
             w_s = ' ' * (20 - len(tag))
-            print("%s:%s μ = %d, posted %d times, received %d likes" % (tag, w_s, item[3], item[1], item[2]))
+            print("%s:%s μ/σ = %f, μ = %f, σ = %f, posted %d times, received %d likes" % (tag, w_s,
+                                                                                          item[5],
+                                                                                          item[3],
+                                                                                          item[4],
+                                                                                          item[1],
+                                                                                          item[2]))
 
     def find_dayofweek_stat(self):
         dow = dict()
@@ -86,7 +101,7 @@ class Collection(object):
             dow[day] = times_likes
         for day in dow:
             times, likes = dow[day]
-            print("%s: μ = %d, posted %d times, received %d likes" % (day, float(likes) / times, times, likes))
+            print("%s: μ = %f, posted %d times, received %d likes" % (day, float(likes) / times, times, likes))
 
     def find_timeofday_stat(self):
         utc_tod = dict()
@@ -104,10 +119,9 @@ class Collection(object):
         for item in sorted(tod, key=lambda i: i[3]):
             hour = item[0]
             w_s = ' ' * (5 - len(hour))
-            print("%s:%s μ = %d, posted %d times, received %d likes" % (hour, w_s, item[3], item[1], item[2]))
+            print("%s:%s μ = %f, posted %d times, received %d likes" % (hour, w_s, item[3], item[1], item[2]))
 
 
 if __name__ == '__main__':
-    c = Collection(MYDATA_JSON)
-    c.find_timeofday_stat()
-
+    inst = Instat(MYDATA_JSON)
+    inst.analyse_tags(larger_than=10, smaller_than=100)
