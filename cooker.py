@@ -10,12 +10,14 @@ DATE = 'date'
 
 class Instat(object):
     def __init__(self, json_fname):
+        self.json_fname = json_fname
         self.collection = list()
         self.tags = set()
-        self.cook(json_fname)
+        self.cook()
 
-    def cook(self, json_fname):
-        collection = load_json(json_fname)
+    def cook(self):
+        self.collection = list()
+        collection = load_json(self.json_fname)
         for url in collection:
             item = collection[url]
             tags = item[TAGS]
@@ -24,16 +26,17 @@ class Instat(object):
             date = datetime.strptime(item[DATE], "%b %d, %Y %I:%M%p %Z")
             self.collection.append({URL: url, LIKES: item[LIKES], TAGS: tags, DATE: date})
 
-    def filter_by_date(self, start, end):
+    def filter_by_date(self, start, end, printer_on=False):
+        # filter_by_date('29.01.2017', '29.01.2018')
         try:
             start, end = map(lambda d: datetime.strptime(d, "%d.%m.%Y"), (start, end))
-            print("Filtered from", start, 'to', end)
         except ValueError:
             print("Wrong date(s)")
             return
-        filtered = sorted([item for item in self.collection if start <= item[DATE] <= end], key=lambda i: i[DATE])
-        self.prettyprint(filtered)
-        return filtered
+        self.collection = [item for item in self.collection if start <= item[DATE] < end]
+        if printer_on:
+            print("Filtered from", start, 'to', end)
+            self.prettyprint_sorted_by(DATE, large_to_small=False)
 
     def prettyprint(self, allotment=None):
         ind = 1
@@ -50,15 +53,33 @@ class Instat(object):
             print()
             ind += 1
 
-    def prettyprint_sorted_by(self, field):
-        self.collection.sort(key=lambda i: i[field], reverse=True)
-        self.prettyprint()
+    def prettyprint_sorted_by(self, field, large_to_small=True, allotment=None):
+        if not allotment:
+            allotment = self.collection
+        allotment.sort(key=lambda i: i[field], reverse=large_to_small)
+        self.prettyprint(allotment)
 
     def find_by_tag(self, tag):
         self.prettyprint([item for item in self.collection if tag in item[TAGS]])
 
     def find_total_likes(self):
         print(sum(item[LIKES] for item in self.collection))
+
+    def count_by_year(self):
+        prefix = '01.01.'
+        self.filter_by_date("1.01.1900", "1.01.2018")
+        initial_year = int(self.collection[0][DATE].strftime('%Y'))
+        curr_year = int(datetime.today().strftime('%Y'))
+        from_year = initial_year
+        till_year = initial_year + 1
+        while till_year <= curr_year + 1:
+            self.cook()
+            self.filter_by_date(prefix + str(from_year), prefix + str(till_year))
+            print("%d: %d pics" % (from_year, len(self.collection)))
+            from_year += 1
+            till_year += 1
+        self.cook()
+        print(len(self.collection), "pics total")
 
     def find_tag_freqs(self):
         tag_freqs = dict.fromkeys(list(self.tags), 0)
@@ -132,4 +153,4 @@ class Instat(object):
 
 if __name__ == '__main__':
     inst = Instat(MYDATA_JSON)
-    inst.filter_by_date("1.12.2016", "1.12.2017")
+    inst.filter_by_date('01.01.2000', '01.01.2014', True)
