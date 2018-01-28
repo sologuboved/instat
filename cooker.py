@@ -71,15 +71,15 @@ class Collection(object):
             times_likes[0] += 1
             times_likes[1] += item[LIKES]
             utc_tod[hour] = times_likes
-        tod = dict()
+        tod = list()
         for utc_hour in utc_tod:
             times, likes = utc_tod[utc_hour]
             hour = str(int(utc_hour[:2]) + 3) + utc_hour[2:]
-            tod[hour] = (times, likes, float(likes) / times)
-        for item in sorted(tod.items(), key=lambda i: i[1][2]):
+            tod.append((hour, times, likes, float(likes) / times))
+        for item in sorted(tod, key=lambda i: i[3]):
             hour = item[0]
             w_s = ' ' * (5 - len(hour))
-            print("%s:%s μ = %d, posted %d times, received %d likes" % (hour, w_s, item[1][2], item[1][0], item[1][1]))
+            print("%s:%s μ = %d, posted %d times, received %d likes" % (hour, w_s, item[3], item[1], item[2]))
 
     def find_total_likes(self):
         print(sum(item[LIKES] for item in self.collection))
@@ -93,9 +93,15 @@ class Collection(object):
                 times_likes[0] += 1
                 times_likes[1] += item[LIKES]
                 all_tags[tag] = times_likes
+        filtered_tags = list()
         for tag in all_tags:
             times, likes = all_tags[tag]
-            print("%s: μ = %d, posted %d times, received %d likes" % (tag, float(likes) / times, times, likes))
+            if 10 <= times <= 100:
+                filtered_tags.append((tag, times, likes, float(likes) / times))
+        for item in sorted(filtered_tags, key=lambda i: i[3], reverse=True):
+            tag = item[0]
+            w_s = ' ' * (20 - len(tag))
+            print("%s:%s μ = %d, posted %d times, received %d likes" % (tag, w_s, item[3], item[1], item[2]))
 
     def find_by_tag(self, tag):
         self.prettyprint([item for item in self.collection if tag in item[TAGS]])
@@ -103,5 +109,5 @@ class Collection(object):
 
 if __name__ == '__main__':
     c = Collection(MYDATA_JSON)
-    c.find_by_tag('zoo')
+    c.find_timeofday_stat()
 
