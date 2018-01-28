@@ -25,7 +25,15 @@ class Instat(object):
             self.collection.append({URL: url, LIKES: item[LIKES], TAGS: tags, DATE: date})
 
     def filter_by_date(self, start, end):
-        pass
+        try:
+            start, end = map(lambda d: datetime.strptime(d, "%d.%m.%Y"), (start, end))
+            print("Filtered from", start, 'to', end)
+        except ValueError:
+            print("Wrong date(s)")
+            return
+        filtered = sorted([item for item in self.collection if start <= item[DATE] <= end], key=lambda i: i[DATE])
+        self.prettyprint(filtered)
+        return filtered
 
     def prettyprint(self, allotment=None):
         ind = 1
@@ -124,4 +132,4 @@ class Instat(object):
 
 if __name__ == '__main__':
     inst = Instat(MYDATA_JSON)
-    inst.analyse_tags(larger_than=10, smaller_than=100)
+    inst.filter_by_date("1.12.2016", "1.12.2017")
