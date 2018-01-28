@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
-from json_operations import dump_json
+from basic_operations import dump_json
 
 
 MYDATA = 'myrawdata.txt'

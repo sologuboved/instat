@@ -1,7 +1,7 @@
 import re
 import requests
 from bs4 import BeautifulSoup
-from json_operations import *
+from basic_operations import *
 from process_txt import collect_urls
 
 

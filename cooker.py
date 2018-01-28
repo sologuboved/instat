@@ -1,5 +1,5 @@
 from datetime import datetime
-from json_operations import *
+from basic_operations import *
 
 MYDATA_JSON = 'mydata.json'
 URL = 'url'
@@ -39,6 +39,16 @@ class Collection(object):
             print()
             ind += 1
 
+    def prettyprint_sorted_by(self, field):
+        self.collection.sort(key=lambda i: i[field], reverse=True)
+        self.prettyprint()
+
+    def find_by_tag(self, tag):
+        self.prettyprint([item for item in self.collection if tag in item[TAGS]])
+
+    def find_total_likes(self):
+        print(sum(item[LIKES] for item in self.collection))
+
     def find_tag_freqs(self):
         tag_freqs = dict.fromkeys(list(self.tags), 0)
         for item in self.collection:
@@ -47,9 +57,24 @@ class Collection(object):
         for freq in sorted(tag_freqs.items(), key=lambda i: i[1], reverse=True):
             print(freq[0] + ':', freq[1])
 
-    def sort_by(self, field):
-        self.collection.sort(key=lambda i: i[field], reverse=True)
-        self.prettyprint()
+    def analyze_tags(self):
+        all_tags = dict()
+        for item in self.collection:
+            tags = item[TAGS]
+            for tag in tags:
+                times_likes = all_tags.get(tag, [0, 0])
+                times_likes[0] += 1
+                times_likes[1] += item[LIKES]
+                all_tags[tag] = times_likes
+        filtered_tags = list()
+        for tag in all_tags:
+            times, likes = all_tags[tag]
+            if 10 <= times <= 100:
+                filtered_tags.append((tag, times, likes, float(likes) / times))
+        for item in sorted(filtered_tags, key=lambda i: i[3], reverse=True):
+            tag = item[0]
+            w_s = ' ' * (20 - len(tag))
+            print("%s:%s μ = %d, posted %d times, received %d likes" % (tag, w_s, item[3], item[1], item[2]))
 
     def find_dayofweek_stat(self):
         dow = dict()
@@ -80,31 +105,6 @@ class Collection(object):
             hour = item[0]
             w_s = ' ' * (5 - len(hour))
             print("%s:%s μ = %d, posted %d times, received %d likes" % (hour, w_s, item[3], item[1], item[2]))
-
-    def find_total_likes(self):
-        print(sum(item[LIKES] for item in self.collection))
-
-    def analyze_tags(self):
-        all_tags = dict()
-        for item in self.collection:
-            tags = item[TAGS]
-            for tag in tags:
-                times_likes = all_tags.get(tag, [0, 0])
-                times_likes[0] += 1
-                times_likes[1] += item[LIKES]
-                all_tags[tag] = times_likes
-        filtered_tags = list()
-        for tag in all_tags:
-            times, likes = all_tags[tag]
-            if 10 <= times <= 100:
-                filtered_tags.append((tag, times, likes, float(likes) / times))
-        for item in sorted(filtered_tags, key=lambda i: i[3], reverse=True):
-            tag = item[0]
-            w_s = ' ' * (20 - len(tag))
-            print("%s:%s μ = %d, posted %d times, received %d likes" % (tag, w_s, item[3], item[1], item[2]))
-
-    def find_by_tag(self, tag):
-        self.prettyprint([item for item in self.collection if tag in item[TAGS]])
 
 
 if __name__ == '__main__':
