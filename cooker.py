@@ -1,3 +1,4 @@
+import random
 from datetime import datetime
 from basic_operations import *
 
@@ -58,6 +59,9 @@ class Instat(object):
             allotment = self.collection
         allotment.sort(key=lambda i: i[field], reverse=large_to_small)
         self.prettyprint(allotment)
+
+    def get_random_pic(self):
+        print(self.collection[random.randrange(len(self.collection))][URL])
 
     def find_by_tag(self, tag):
         self.prettyprint([item for item in self.collection if tag in item[TAGS]])
@@ -157,6 +161,5 @@ class Instat(object):
 
 if __name__ == '__main__':
     inst = Instat(MYDATA_JSON)
-    inst.filter_by_date('01.01.2016', '01.01.2020')
-    inst.analyse_tags(larger_than=10, sort_by_mean=True)
+    inst.get_random_pic()
 
