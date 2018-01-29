@@ -89,7 +89,7 @@ class Instat(object):
         for freq in sorted(tag_freqs.items(), key=lambda i: i[1], reverse=True):
             print(freq[0] + ':', freq[1])
 
-    def analyse_tags(self, larger_than=0, smaller_than=float('inf')):
+    def analyse_tags(self, larger_than=0, smaller_than=float('inf'), sort_by_mean=False):
         all_tags = dict()
         for item in self.collection:
             tags = item[TAGS]
@@ -110,7 +110,11 @@ class Instat(object):
                     filtered_tags.append((tag, times, num_likes, mean, s_d, quotient))
                 except ZeroDivisionError:
                     pass
-        for item in sorted(filtered_tags, key=lambda i: i[5], reverse=True):
+        if sort_by_mean:
+            filtered_tags.sort(key=lambda i: i[3], reverse=True)
+        else:
+            filtered_tags.sort(key=lambda i: i[5], reverse=True)
+        for item in filtered_tags:
             tag = item[0]
             w_s = ' ' * (20 - len(tag))
             print("%s:%s μ/σ = %f, μ = %f, σ = %f, posted %d times, received %d likes" % (tag, w_s,
@@ -153,4 +157,6 @@ class Instat(object):
 
 if __name__ == '__main__':
     inst = Instat(MYDATA_JSON)
-    inst.filter_by_date('01.01.2000', '01.01.2014', True)
+    inst.filter_by_date('01.01.2016', '01.01.2020')
+    inst.analyse_tags(larger_than=10, sort_by_mean=True)
+
