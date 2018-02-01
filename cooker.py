@@ -1,5 +1,5 @@
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 from basic_operations import *
 
 MYDATA_JSON = 'mydata.json'
@@ -24,7 +24,7 @@ class Instat(object):
             tags = item[TAGS]
             for tag in tags:
                 self.tags.add(tag)
-            date = datetime.strptime(item[DATE], "%b %d, %Y %I:%M%p %Z")
+            date = datetime.strptime(item[DATE], "%b %d, %Y %I:%M%p %Z") + timedelta(hours=3)
             self.collection.append({URL: url, LIKES: item[LIKES], TAGS: tags, DATE: date})
 
     def filter_by_date(self, start, end, printer_on=False):
@@ -98,20 +98,20 @@ class Instat(object):
         for item in self.collection:
             tags = item[TAGS]
             for tag in tags:
-                new_likes = all_tags.get(tag, list())
-                new_likes.append(item[LIKES])
-                all_tags[tag] = new_likes
+                likes = all_tags.get(tag, list())
+                likes.append(item[LIKES])
+                all_tags[tag] = likes
         filtered_tags = list()
         for tag in all_tags:
             likes = all_tags[tag]
             times = len(likes)
             if larger_than < times < smaller_than:
-                num_likes = sum(likes)
-                mean = num_likes / float(times)
+                total_likes = sum(likes)
+                mean = total_likes / float(times)
                 s_d = find_sd(likes, mean)
                 try:
                     quotient = mean / s_d
-                    filtered_tags.append((tag, times, num_likes, mean, s_d, quotient))
+                    filtered_tags.append((tag, times, total_likes, mean, s_d, quotient))
                 except ZeroDivisionError:
                     pass
         if sort_by_mean:
@@ -141,25 +141,31 @@ class Instat(object):
             print("%s: μ = %f, posted %d times, received %d likes" % (day, float(likes) / times, times, likes))
 
     def find_timeofday_stat(self):
-        utc_tod = dict()
+        tod = dict()
         for item in self.collection:
-            hour = item[DATE].strftime('%I') + item[DATE].strftime('%p')
-            times_likes = utc_tod.get(hour, [0, 0])
-            times_likes[0] += 1
-            times_likes[1] += item[LIKES]
-            utc_tod[hour] = times_likes
-        tod = list()
-        for utc_hour in utc_tod:
-            times, likes = utc_tod[utc_hour]
-            hour = str(int(utc_hour[:2]) + 3) + utc_hour[2:]
-            tod.append((hour, times, likes, float(likes) / times))
-        for item in sorted(tod, key=lambda i: i[3]):
-            hour = item[0]
+            hour = item[DATE].strftime('%H')
+            likes = tod.get(hour, list())
+            likes.append(item[LIKES])
+            tod[hour] = likes
+        for hour in tod:
+            likes = tod[hour]
+            times = len(likes)
+            total_likes = sum(likes)
+            mean = float(total_likes) / times
+            s_d = find_sd(likes, mean)
+            tod[hour] = (times, total_likes, mean, s_d)
+        for item in sorted(tod.items(), key=lambda i: i[0]):
+            hour, vals = item
             w_s = ' ' * (5 - len(hour))
-            print("%s:%s μ = %f, posted %d times, received %d likes" % (hour, w_s, item[3], item[1], item[2]))
+            print("%s:%s μ = %f, σ = %f, posted %d times, received %d likes" % (hour, w_s,
+                                                                                vals[2], vals[3], vals[0], vals[1]))
 
 
 if __name__ == '__main__':
     inst = Instat(MYDATA_JSON)
-    inst.get_random_pic()
+    inst.filter_by_date('29.01.2014', '29.01.2019', printer_on=False)
+    print()
+    inst.find_dayofweek_stat()
+    print()
+    inst.find_timeofday_stat()
 
