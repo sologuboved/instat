@@ -42,7 +42,7 @@ def scrape_page(page_url):
 
     # print(str_soup)
 
-    # <meta content="0 Likes, 1 Comments - Буратино (@thalassografia) on Instagram: “Собр. статей греческих
+    # <meta content="0 Likes, 1 Comments - Буратино (@sologuboved) on Instagram: “Собр. статей греческих
     # психоаналитиков о У.Р. Бионе #βιβλία #w_r_bion #ελληνικά_τώρα”" name="description"/>
 
     # <meta content="dusk" property="instapp:hashtags"/>
@@ -78,10 +78,10 @@ def print_glitch(text, page_url):
 
 if __name__ == '__main__':
     pass
-    # scrape_page('https://www.instagram.com/p/BdpQMUFBf3b/?taken-by=thalassografia')
+    # scrape_page('https://www.instagram.com/p/BdpQMUFBf3b/?taken-by=sologuboved')
     dump_collection(MYDATA_JSON, MYDATA25, MYDATA, INSTAGRAM)
     # coll = load_json(MYDATA_JSON)
-    # print(coll['https://www.instagram.com/p/7TNru4AwSX/?taken-by=thalassografia'])
+    # print(coll['https://www.instagram.com/p/7TNru4AwSX/?taken-by=sologuboved'])
     # print(len(coll))
     # convert(MYDATA_JSON)
 

@@ -13,7 +13,7 @@ INSTAGRAM = 'https://www.instagram.com'
 def process(fname, border=None):
     with open(fname, encoding="utf-8") as handler1:
         big_str = ' '.join(handler1.readlines())
-        postfixes = re.findall('a href="(.*?taken-by=thalassografia)', big_str)
+        postfixes = re.findall('a href="(.*?taken-by=sologuboved)', big_str)
         if not border:
             border = len(postfixes)
         return postfixes[: border]
